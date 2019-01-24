@@ -91,78 +91,83 @@ class IPV4(object):
 
     def rep_remote_copy(self, host, user, pwd):
         logfile = 'logs_%s.txt' % time.strftime('%Y-%m-%d_%H-%M-%S', time.localtime())
-        try:
-            # 用wmi连接到远程win7系统设置IP
-            win7 = winrm.Session('http://%s:5985/wsman' % (host), auth=('Admin', 'Admin'))
-            print("%s ----终端文件夹再次重新开始拷贝!" % (host))
-            # 远程文件共享服务器认证
-            win7.run_cmd(r'net use \\192.168.48.223\ipc$ "123456"  /user:"timbaland\administrator" ')
-
-            # 从共享服务器上复制名字为终端文件夹到本地
-            win7.run_cmd(r'xcopy \\192.168.48.223\share\课堂管理软件\终端  /y /s /e /c /z C:\终端')
-            print("%s ----终端文件夹终于拷贝成功!" % (host))
-            # ------------
-            # ------------
-            print("%s ----DLL文件夹再次重新开始拷贝!" % (host))
-            #  复制DDL文件
-
-            # 从共享服务器上复制名字为DLL文件夹到本地
-            win7.run_cmd(r'xcopy \\192.168.48.223\share\课堂管理软件\DLL  /y /s /e /c /z C:\Windows\DLL')
-            print("%s ----DLL文件夹终于拷贝成功" % (host))
-            # -----------
-            # -----------
-            print("%s ----汇捷快捷方式文件再次开始拷贝" % (host))
-            #  复制D汇捷快捷方式
-            # 从共享服务器上复制名字为DLL文件夹到本地
-            win7.run_cmd(r'xcopy \\192.168.48.223\share\课堂管理软件\云桌面快捷方式 /y /s /e /c /z C:\users\admin\desktop')
-            print("%s ----汇捷快捷方式终于拷贝成功!" % (host))
-            return True
-        except Exception as e:
-            print(e)
-    #远程拷贝文件&&文件夹到远程主机上
-    def call_remote_copy(self, host, user, pwd):
-            logfile = 'logs_%s.txt' % time.strftime('%Y-%m-%d_%H-%M-%S', time.localtime())
+        if host not in copy_host:
             try:
                 # 用wmi连接到远程win7系统设置IP
-                win7 = winrm.Session('http://%s:5985/wsman' %(host),auth=('Admin','Admin'))
-                print("%s ----终端文件夹开始拷贝!" % (host))
-                #远程文件共享服务器认证
+                win7 = winrm.Session('http://%s:5985/wsman' % (host), auth=('Admin', 'Admin'))
+                print("%s ----终端文件夹再次重新开始拷贝!" % (host))
+                # 远程文件共享服务器认证
                 win7.run_cmd(r'net use \\192.168.48.223\ipc$ "123456"  /user:"timbaland\administrator" ')
-                #远程强制删除C:\终端
-                win7.run_cmd(r'rd/s/q C:\终端')
-                #远程创建C:\终端
-                win7.run_cmd(r'md C:\终端')
-                #从共享服务器上复制名字为终端文件夹到本地
+
+                # 从共享服务器上复制名字为终端文件夹到本地
                 win7.run_cmd(r'xcopy \\192.168.48.223\share\课堂管理软件\终端  /y /s /e /c /z C:\终端')
-                print("%s ----终端文件夹拷贝成功!" % (host))
-                #------------
-                #------------
-                print("%s ----DLL文件夹开始拷贝!" % (host))
+                print("%s ----终端文件夹终于拷贝成功!" % (host))
+                # ------------
+                # ------------
+                print("%s ----DLL文件夹再次重新开始拷贝!" % (host))
                 #  复制DDL文件
-                # 远程强制删除C:\Windows\DLL
-                win7.run_cmd(r'rd/s/q C:\Windows\DLL')
-                # 远程创建C:\Windows\DLL
-                win7.run_cmd(r'md C:\Windows\DLL')
+
                 # 从共享服务器上复制名字为DLL文件夹到本地
                 win7.run_cmd(r'xcopy \\192.168.48.223\share\课堂管理软件\DLL  /y /s /e /c /z C:\Windows\DLL')
-                print("%s ----DLL文件夹拷贝成功" % (host))
-                #-----------
-                #-----------
-                print("%s ----汇捷快捷方式文件开始拷贝" % (host))
+                print("%s ----DLL文件夹终于拷贝成功" % (host))
+                # -----------
+                # -----------
+                print("%s ----汇捷快捷方式文件再次开始拷贝" % (host))
                 #  复制D汇捷快捷方式
                 # 从共享服务器上复制名字为DLL文件夹到本地
                 win7.run_cmd(r'xcopy \\192.168.48.223\share\课堂管理软件\云桌面快捷方式 /y /s /e /c /z C:\users\admin\desktop')
-                print("%s ----汇捷快捷方式拷贝成功!"%(host))
+                print("%s ----汇捷快捷方式终于拷贝成功!" % (host))
+                copy_host.append(host)
                 return True
             except Exception as e:
-                print(host + '  网络故障')
-                log = open(logfile, 'a')
-                log.write(('%s %s call  Failed!\r\n') % (host, e))
-                log.close()
+                print(e)
                 self.rep_remote_copy(host,user,pwd)
-                return False
-            finally:
-                print('copy continue')
+    #远程拷贝文件&&文件夹到远程主机上
+    def call_remote_copy(self, host, user, pwd):
+            logfile = 'logs_%s.txt' % time.strftime('%Y-%m-%d_%H-%M-%S', time.localtime())
+            if host not in copy_host:
+                try:
+                    # 用wmi连接到远程win7系统设置IP
+                    win7 = winrm.Session('http://%s:5985/wsman' %(host),auth=('Admin','Admin'))
+                    print("%s ----终端文件夹开始拷贝!" % (host))
+                    #远程文件共享服务器认证
+                    win7.run_cmd(r'net use \\192.168.48.223\ipc$ "123456"  /user:"timbaland\administrator" ')
+                    #远程强制删除C:\终端
+                    win7.run_cmd(r'rd/s/q C:\终端')
+                    #远程创建C:\终端
+                    win7.run_cmd(r'md C:\终端')
+                    #从共享服务器上复制名字为终端文件夹到本地
+                    win7.run_cmd(r'xcopy \\192.168.48.223\share\课堂管理软件\终端  /y /s /e /c /z C:\终端')
+                    print("%s ----终端文件夹拷贝成功!" % (host))
+                    #------------
+                    #------------
+                    print("%s ----DLL文件夹开始拷贝!" % (host))
+                    #  复制DDL文件
+                    # 远程强制删除C:\Windows\DLL
+                    win7.run_cmd(r'rd/s/q C:\Windows\DLL')
+                    # 远程创建C:\Windows\DLL
+                    win7.run_cmd(r'md C:\Windows\DLL')
+                    # 从共享服务器上复制名字为DLL文件夹到本地
+                    win7.run_cmd(r'xcopy \\192.168.48.223\share\课堂管理软件\DLL  /y /s /e /c /z C:\Windows\DLL')
+                    print("%s ----DLL文件夹拷贝成功" % (host))
+                    #-----------
+                    #-----------
+                    print("%s ----汇捷快捷方式文件开始拷贝" % (host))
+                    #  复制D汇捷快捷方式
+                    # 从共享服务器上复制名字为DLL文件夹到本地
+                    win7.run_cmd(r'xcopy \\192.168.48.223\share\课堂管理软件\云桌面快捷方式 /y /s /e /c /z C:\users\admin\desktop')
+                    print("%s ----汇捷快捷方式拷贝成功!"%(host))
+                    copy_host.append(host)
+                    return True
+                except Exception as e:
+                    print(host + '  网络故障')
+                    log = open(logfile, 'a')
+                    log.write(('%s %s call  Failed!\r\n') % (host, e))
+                    log.close()
+                    self.rep_remote_copy(host,user,pwd)
+                    return False
+                finally:
+                    print('copy continue')
 
 
 if __name__ == '__main__':
@@ -177,7 +182,9 @@ if __name__ == '__main__':
     p = IPV4('192.168.48.')
     # p.asynchronous(p.ping_call)
     #获取IP集合
-    m_ip = ['192.168.48.6','192.168.48.62']
+    m_ip = ['192.168.48.6','192.168.48.62','192.168.48.174','192.168.49.14']
+    global copy_host
+    copy_host = []
 #收集在线IP地址
     # for ip in range(62,63):
     #     if p.ping_call(ip) is not None:
