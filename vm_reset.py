@@ -22,6 +22,7 @@ logger = logging.getLogger(__name__)
 
 
 class VcentTools(object):
+
     def __init__(self, host_ip, user, password,flag):
         self.host_ip = host_ip
         self.user = user
@@ -104,6 +105,31 @@ class VcentTools(object):
 
             except Exception as e:
                 return 2
+    def del_datas(self,vm_name,guster_user,guster_pwd,del_dir):
+        server_obj = VIServer()
+        try:
+            server_obj.connect(self.host_ip, self.user, self.password)
+        except Exception as  e:
+            print(e)
+        # 通过名称获取vm的实例
+        try:
+            vm = server_obj.get_vm_by_name(vm_name)
+        except Exception as e:
+            # print(e)
+            return 0
+        print(vm.get_tools_status())
+        if vm.get_tools_status() == 'RUNNING': #判断tools状态
+            print(f'{vm_name} tools is  RUNING--------------------')
+            try :
+                vm.login_in_guest(guster_user,guster_pwd)
+                vm.delete_directory(del_dir, recursive=True)  # 清空数据盘
+            except Exception as e:
+                print(e)
+
+            finally:
+                print(f'{vm_name} 数据盘清空完毕！！！！！')
+        else:
+            print(f'{vm_name} tools is not RUNING--------------------')
 
 class Class_VM(object):
     def __init__(self, host, user, pwd, port, db, charset):
