@@ -14,12 +14,12 @@ class Wroot():
         self.width = width
         self.height = height
         self.backgroud = backgroud
-        print(f"注意：1、确保本地电脑可以ping通vcenter -> {cf.get('vc1', 'vc_ip')} \n")
-        print(f"注意：2、确保本地电脑可以ping通汇捷 ->{cf.get('hj_db', 'db_host')} \n")
+        print(f"注意：1、确保本地电脑可以ping通vcenter ->>> {cf.get('vc1', 'vc_ip')} \n")
+        print(f"注意：2、确保本地电脑可以ping通汇捷 ->>>{cf.get('hj_db', 'db_host')} \n")
         # print(os.popen('ping 192.168.93.2').read())
         # print(os.popen('ping 192.168.93.168').read())
         print(f'注意：3、请选择对应的教室重启云桌面,清理桌面 \n')
-        print(f'注意：4、技术问题请联系轩辕网络工程师：何建平\n')
+        print(f'注意：4、技术问题请联系轩辕网络股份有限公司工程师\n')
         self.setUI()
 
     #初始化窗口
@@ -63,24 +63,32 @@ class Wroot():
 
             #判断是该重置虚拟机还是清空数据盘
             if var.get() == '重置教室桌面虚拟机' :
+                # button_yes.destroy()
                 root.withdraw()
                 for vmname in p.get_vmname(query_vm):
+                    logger.info(f'正在重置{vmname}')
                     if obj1.vmaction(vmname, cf.get('vm_hz', 'vm_hz')) == 0:
                         print(f"is not exsit {cf.get('vc1', 'vc_ip')} ")
-                    logger.info(f'正在重置{vmname}')
+
 
             elif var.get() == "清空虚拟机数据盘":
-                root.withdraw()
+                # root.withdraw()
+                button_yes.destroy()
                 for vmname in p.get_vmname(query_vm):
                     obj1.del_datas(vmname,cf.get('gust_vm','guster_user'),cf.get('gust_vm','guster_pwd'),cf.get('disk_path','disk_path'))
 
-                    print(cf.get('gust_vm','guster_user'),cf.get('gust_vm','guster_pwd'),cf.get('disk_path','disk_path'))
+                    # print(cf.get('gust_vm','guster_user'),cf.get('gust_vm','guster_pwd'),cf.get('disk_path','disk_path'))
                     logger.info(f'正在清理{vmname}数据盘')
+                    show_help.config(text=f'正在清理虚拟机{vmname}数据盘', fg='blue')
+                    show_help.update()
+                    time.sleep(1)
+                    show_help.config(text=f'清理虚拟机{vmname}完毕！！！！', fg='blue')
+                    show_help.update()
             else:
                 showwarning('警告','未选择任何功能')
 
-            root.destroy()
-            root.quit()
+            # root.destroy()
+            # root.quit()
         root = Tk()
         root.title(self.title)
         root.iconbitmap(self.pic)
