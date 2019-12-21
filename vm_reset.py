@@ -124,7 +124,8 @@ class VcentTools(object):
                 vm.login_in_guest(guster_user,guster_pwd)
                 vm.delete_directory(del_dir, recursive=True)  # 清空数据盘
             except Exception as e:
-                print(e)
+                # print(e)
+                pass
 
             finally:
                 print(f'{vm_name} 数据盘清空完毕！！！！！')
