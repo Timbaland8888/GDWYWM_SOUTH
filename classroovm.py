@@ -3,9 +3,19 @@ from tkinter import ttk
 from tkinter.messagebox import  showwarning
 from  con_mysql import Con_mysql
 from vm_reset import  *
+import ctypes,sys
+
 
 class Wroot():
 
+    STD_INPUT_HANDLE = -10
+    STD_OUTPUT_HANDLE = -11
+    STD_ERROR_HANDLE = -12
+    FOREGROUND_RED = 0x0c  # red.
+    FOREGROUND_GREEN = 0x0a  # green.
+    FOREGROUND_BLUE = 0x09  # blue.
+    # get handle
+    std_out_handle = ctypes.windll.kernel32.GetStdHandle(STD_OUTPUT_HANDLE)
     def __init__(self,title,pic,width,height,backgroud):
         cf = configparser.ConfigParser()
         cf.read_file(codecs.open('config.ini', "r", "utf-8-sig"))
@@ -14,24 +24,31 @@ class Wroot():
         self.width = width
         self.height = height
         self.backgroud = backgroud
-        print(f"注意：1、确保本地电脑可以ping通vcenter ->>> {cf.get('vc1', 'vc_ip')} \n")
-        print(f"注意：2、确保本地电脑可以ping通汇捷 ->>>{cf.get('hj_db', 'db_host')} \n")
+        # print(f"注意：1、确保本地电脑可以ping通vcenter ->>> {cf.get('vc1', 'vc_ip')} \n")
+        Wroot.printDarkBlue(f"注意：1、确保本地电脑可以ping通vcenter ->>> {cf.get('vc1', 'vc_ip')} \n",Wroot.FOREGROUND_RED)
+        # print(f"注意：2、确保本地电脑可以ping通汇捷 ->>>{cf.get('hj_db', 'db_host')} \n")
+        Wroot.printDarkBlue(f"注意：2、确保本地电脑可以ping通汇捷 ->>>{cf.get('hj_db', 'db_host')} \n",Wroot.FOREGROUND_RED)
         # print(os.popen('ping 192.168.93.2').read())
         # print(os.popen('ping 192.168.93.168').read())
-        print(f'注意：3、请选择对应的教室重启云桌面,清理桌面 \n')
-        print(f'注意：4、技术问题请联系轩辕网络股份有限公司工程师\n')
+        # print(f'注意：3、请选择对应的教室重启云桌面,清理桌面 \n')
+        Wroot.printDarkBlue(f'注意：3、请选择对应的教室重启云桌面,清理桌面 \n',Wroot.FOREGROUND_RED)
+        # print(f'注意：4、技术问题请联系轩辕网络股份有限公司工程师\n')
+        Wroot.printDarkBlue(f'注意：4、技术问题请联系轩辕网络股份有限公司工程师\n',Wroot.FOREGROUND_RED)
+        Wroot.printDarkBlue('\n\n', Wroot.FOREGROUND_GREEN)
         self.setUI()
 
     #初始化窗口
     def setUI(self):
 
         def _selection1():
+            button_yes.place(x=140, y=180)
             r1.config(bg='red')  # 让对象l显示括号里的内容
             show_help.config(text='提示:  ' + var.get(), fg='blue')
             r2.config(bg='#C0FF3E')
 
 
         def _selection2():
+            button_yes.place(x=140, y=180)
             r2.config(bg='red')  # 让对象l显示括号里的内容
             show_help.config(text='提示:  ' + var.get(),fg='blue')
             r1.config(bg='#C0FF3E')
@@ -63,6 +80,7 @@ class Wroot():
 
             #判断是该重置虚拟机还是清空数据盘
             if var.get() == '重置教室桌面虚拟机' :
+
                 # button_yes.destroy()
                 root.withdraw()
                 for vmname in p.get_vmname(query_vm):
@@ -123,14 +141,24 @@ class Wroot():
         r2 = Radiobutton(root, text='清空数据盘', bg='#C0FF3E', variable=var, value='清空虚拟机数据盘', command=_selection2)
         r2.place(x=90, y=100)
         button_yes = Button(root, text='确定', fg='red', relief='raised', bd=3, font='Helvetica -14 bold ', command=run)
-        button_yes.place(x=140, y=180)
+        # button_yes.place(x=140, y=180)
         show_help = Label(root, bg='#C0FF3E')
         show_help.place(x=90, y=210)
         root.mainloop()
+    @staticmethod
+    def set_cmd_text_color(color, handle=std_out_handle):
+        Bool = ctypes.windll.kernel32.SetConsoleTextAttribute(handle, color)
+        return Bool
 
+    @staticmethod
+    def resetColor(color):
+        Wroot.set_cmd_text_color(color)
+    @staticmethod
+    def printDarkBlue(mess,color):
+        Wroot.set_cmd_text_color(color)
 
-
-
+        sys.stdout.write(mess)
+        Wroot.resetColor(color)
 
 if __name__ == '__main__':
     r = Wroot('重启桌面工具','1.ico', 320,240,'#C0FF3E')
